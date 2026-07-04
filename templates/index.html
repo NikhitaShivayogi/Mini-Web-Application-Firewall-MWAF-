@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel WAF | Secure Infrastructure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --navy: #020c1b;
+            --accent: #64ffda;
+            --white: #e6f1ff;
+            --slate: #8892b0;
+            --light-navy: #112240;
+            --accent-glow: 0 0 20px rgba(100, 255, 218, 0.3);
+        }
+
+        body {
+            background-color: var(--navy);
+            color: var(--slate);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* --- Background Particles --- */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at top, #0a192f 0%, #020c1b 100%);
+        }
+
+        /* --- Clean Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(2, 12, 27, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+            box-sizing: border-box;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Outfit';
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--white);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        /* --- Hero Section Fix --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 120px 20px 80px;
+            box-sizing: border-box;
+        }
+
+        .hero-shield {
+            width: 140px;
+            height: 140px;
+            background: rgba(10, 25, 47, 0.5);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            box-shadow: var(--accent-glow);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .hero-shield::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 50%;
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.9);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Outfit';
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            color: var(--white);
+            margin: 0 0 1rem;
+            line-height: 1.1;
+        }
+
+        .hero p {
+            max-width: 650px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--navy);
+            padding: 15px 35px;
+            border-radius: 5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 15px 35px;
+            border-radius: 5px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--accent-glow);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 255, 218, 0.05);
+        }
+
+        /* --- Infrastructure Section (Neat Grid) --- */
+        .section {
+            padding: 100px 10%;
+            background: rgba(10, 25, 47, 0.3);
+            border-top: 1px solid rgba(100, 255, 218, 0.05);
+        }
+
+        .section-tag {
+            color: var(--accent);
+            font-family: 'Outfit';
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section h2 {
+            font-family: 'Outfit';
+            font-size: 2.2rem;
+            color: var(--white);
+            margin-bottom: 3.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--light-navy);
+            border: 1px solid rgba(100, 255, 218, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+
+        .card i {
+            color: var(--accent);
+            width: 32px;
+            height: 32px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            color: var(--white);
+            font-family: 'Outfit';
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* --- Dossiers Row --- */
+        .dossier-row {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) transparent;
+        }
+
+        .d-card {
+            flex: 0 0 280px;
+            background: rgba(17, 34, 64, 0.5);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .d-card:hover {
+            background: rgba(100, 255, 218, 0.05);
+            border-color: var(--accent);
+        }
+
+        .d-card h4 {
+            color: var(--white);
+            margin: 15px 0 10px;
+        }
+
+        /* --- Modal --- */
+        #modalOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 12, 27, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal {
+            background: var(--light-navy);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <nav>
+        <a href="#" class="logo">
+            <i data-lucide="shield-check" style="width: 28px; height: 28px; color: var(--accent);"></i>
+            Sentinel WAF
+        </a>
+        <div class="nav-links">
+            <a href="#about">INFRASTRUCTURE</a>
+            <a href="#dossiers">Security Features</a>
+            <a href="{{ url_for('login') }}">LOGIN</a>
+            <a href="{{ url_for('register') }}"
+                style="border: 1px solid var(--accent); padding: 8px 20px; border-radius: 4px; color: var(--accent);">REGISTER</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-shield">
+                <i data-lucide="shield-alert" style="width: 60px; height: 60px;"></i>
+            </div>
+            <h1>Secure Your <span style="color: var(--accent);">Web Edge</span></h1>
+            <p>A unified demonstration platform for analyzing, detecting, and blocking common web application threats
+                with intelligent WAF countermeasures.</p>
+            <div class="cta-group">
+                <a href="{{ url_for('login') }}" class="btn-primary">START SESSION</a>
+                <a href="#about" class="btn-secondary">LEARN MORE</a>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <span class="section-tag">// SYSTEM OVERVIEW</span>
+            <div style="max-width: 900px;">
+                <h2 style="font-family: 'Outfit'; font-size: 2.8rem; color: var(--white); margin-bottom: 3.5rem;">🛡️
+                    Mini Web Application Firewall – Dashboard Overview</h2>
+
+                <div
+                    style="display: flex; flex-direction: column; gap: 60px; border-left: 2px solid rgba(100, 255, 218, 0.1); padding-left: 40px; margin-left: 10px;">
+
+                    <!-- 1. Purpose -->
+                    <div>
+                        <h3 style="color: var(--white); font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 15px;">
+                            1️⃣ Purpose of This Application</h3>
+                        <p style="color: var(--slate); font-size: 1.1rem; line-height: 1.7;">
+                            This web application is a security demonstration platform designed to explain and showcase
+                            how common web attacks are detected and blocked using Web Application Firewall (WAF)
+                            techniques.
+                            <br><br>
+                            This system is not intended for normal end users, but for security monitoring and
+                            educational purposes.
+                        </p>
+                    </div>
+
+                    <!-- 2. Access -->
+                    <div>
+                        <h3 style="color: var(--white); font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 15px;">
+                            2️⃣ Who Can Access This System?</h3>
+                        <p style="color: var(--slate); font-size: 1.1rem; line-height: 1.7;">
+                            Only authorized security users (such as administrators or security analysts) can log in to
+                            this system.
+                            <br><br>
+                            Because of this:<br>
+                            <span style="color: var(--accent); opacity: 0.8;">• All login alerts</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Attack detection logs</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Security events</span><br>
+                            <br>
+                            are visible to every logged-in user, as they represent security personnel, not regular
+                            users.
+                        </p>
+                    </div>
+
+                    <!-- 3. What You See -->
+                    <div>
+                        <h3 style="color: var(--white); font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 15px;">
+                            3️⃣ What You See on This Dashboard</h3>
+                        <p style="color: var(--slate); font-size: 1.1rem; line-height: 1.7;">
+                            After successful login, the dashboard displays:<br><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Detected attack attempts</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Failed and suspicious login
+                                activities</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Types of attacks such as: SQL Injection,
+                                Cross-Site Scripting (XSS), Brute-Force Attack, Credential Stuffing.</span><br>
+                            <br>
+                            These activities help demonstrate how attacks occur and how the system responds.
+                        </p>
+                    </div>
+
+                    <!-- 4. Shared Visibility -->
+                    <div>
+                        <h3 style="color: var(--white); font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 15px;">
+                            4️⃣ Why All Users See Security Alerts</h3>
+                        <p style="color: var(--slate); font-size: 1.1rem; line-height: 1.7;">
+                            In this mini project:<br><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• All registered users are treated as
+                                security dashboard users</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Therefore, attack information is shared
+                                to help understand system behavior</span><br>
+                            <br>
+                            In real-world applications, such data would usually be visible only to administrators.
+                        </p>
+                    </div>
+
+                    <!-- 5. Real-World Value -->
+                    <div>
+                        <h3 style="color: var(--white); font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 15px;">
+                            5️⃣ Real-World Application Value</h3>
+                        <p style="color: var(--slate); font-size: 1.1rem; line-height: 1.7;">
+                            If these security mechanisms are implemented in real-world web applications:<br><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• They can detect malicious
+                                activities</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Prevent unauthorized access</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Improve overall application
+                                security</span><br>
+                            <br>
+                            This project demonstrates how basic WAF concepts can be applied to protect modern web
+                            applications.
+                        </p>
+                    </div>
+
+                    <!-- 6. Educational Note -->
+                    <div>
+                        <h3 style="color: var(--white); font-family: 'Outfit'; font-size: 1.5rem; margin-bottom: 15px;">
+                            6️⃣ Educational Note</h3>
+                        <p style="color: var(--slate); font-size: 1.1rem; line-height: 1.7;">
+                            This system is built as an academic mini project to:<br><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Understand web security
+                                attacks</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Visualize how attacks are
+                                detected</span><br>
+                            <span style="color: var(--accent); opacity: 0.8;">• Learn how firewall-based protection
+                                improves application security</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dossiers" class="section" style="background: transparent;">
+            <span class="section-tag">// THREAT INTEL</span>
+            <h2>Security Features</h2>
+            <div class="dossier-row">
+                <div class="d-card" onclick="openModal('sqli')">
+                    <i data-lucide="database" style="color: var(--accent);"></i>
+                    <h4>SQL Injection</h4>
+                    <p>Blocking weaponized database queries.</p>
+                </div>
+                <div class="d-card" onclick="openModal('xss')">
+                    <i data-lucide="code" style="color: var(--accent);"></i>
+                    <h4>XSS Engine</h4>
+                    <p>Intercepting malicious client scripts.</p>
+                </div>
+                <div class="d-card" onclick="openModal('bruteforce')">
+                    <i data-lucide="key" style="color: var(--accent);"></i>
+                    <h4>Brute Force</h4>
+                    <p>Threshold-based account protection.</p>
+                </div>
+                <div class="d-card" onclick="openModal('stuffing')">
+                    <i data-lucide="activity" style="color: var(--accent);"></i>
+                    <h4>Stuffing Guard</h4>
+                    <p>Detecting credential behavior patterns.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modalOverlay">
+        <div class="modal">
+            <button class="close-btn" onclick="closeModal()">CLOSE</button>
+            <div id="mContent"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        lucide.createIcons();
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 80 },
+                "color": { "value": "#64ffda" },
+                "opacity": { "value": 0.2 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#64ffda", "opacity": 0.1 }
+            }
+        });
+
+        const attackData = {
+            sqli: `
+                <h2 style="color: var(--white); margin-bottom: 20px;">🔐 SQL Injection (SQLi)</h2>
+                <div style="color: var(--white); line-height: 1.8;">
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">📌 What is SQL Injection?</p>
+                    <p style="color: var(--slate); margin-bottom: 20px;">SQL Injection is an attack where a hacker tries to access or modify the database by entering malicious SQL commands into input fields like login forms.</p>
+                    
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">⚙️ How This Attack Occurs</p>
+                    <ul style="color: var(--slate); margin-bottom: 20px; padding-left: 20px;">
+                        <li>Attacker enters SQL code instead of normal input.</li>
+                        <li>The application blindly executes the input as a database query.</li>
+                        <li>Sensitive data like usernames or passwords may be exposed.</li>
+                    </ul>
+
+                    <div style="background: rgba(255, 77, 77, 0.1); border: 1px solid var(--alert); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <span style="color: var(--white); font-weight: 700;">🧪 Example Malicious Input</span><br>
+                        <code style="color: #ff4d4d;">' OR '1'='1</code>
+                    </div>
+
+                    <div style="background: rgba(100, 255, 218, 0.1); border: 1px solid var(--accent); padding: 15px; border-radius: 8px;">
+                        <span style="color: var(--white); font-weight: 700;">🛡️ How WAF Protects</span><br>
+                        <ul style="color: var(--slate); padding-left: 20px; margin-top: 10px;">
+                            <li>Detects SQL keywords (SELECT, OR, DROP)</li>
+                            <li>Blocks suspicious queries</li>
+                            <li>Logs the attempt and prevents database access</li>
+                        </ul>
+                    </div>
+                </div>`,
+            xss: `
+                <h2 style="color: var(--white); margin-bottom: 20px;">🛑 Cross-Site Scripting (XSS)</h2>
+                <div style="color: var(--white); line-height: 1.8;">
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">📌 What is XSS?</p>
+                    <p style="color: var(--slate); margin-bottom: 20px;">Cross-Site Scripting is an attack where malicious scripts are injected into web pages and executed in other users’ browsers.</p>
+                    
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">⚙️ How This Attack Occurs</p>
+                    <ul style="color: var(--slate); margin-bottom: 20px; padding-left: 20px;">
+                        <li>Attacker injects JavaScript code into input fields.</li>
+                        <li>The script gets stored or reflected on the webpage.</li>
+                        <li>When another user views the page, the script runs automatically.</li>
+                    </ul>
+
+                    <div style="background: rgba(255, 77, 77, 0.1); border: 1px solid var(--alert); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <span style="color: var(--white); font-weight: 700;">🧪 Example Malicious Input</span><br>
+                        <code style="color: #ff4d4d;">&lt;script&gt;alert('Hacked')&lt;/script&gt;</code>
+                    </div>
+
+                    <div style="background: rgba(100, 255, 218, 0.1); border: 1px solid var(--accent); padding: 15px; border-radius: 8px;">
+                        <span style="color: var(--white); font-weight: 700;">🛡️ How WAF Protects</span><br>
+                        <ul style="color: var(--slate); padding-left: 20px; margin-top: 10px;">
+                            <li>Detects script tags and JavaScript patterns</li>
+                            <li>Sanitizes user input</li>
+                            <li>Blocks script execution before page rendering</li>
+                        </ul>
+                    </div>
+                </div>`,
+            bruteforce: `
+                <h2 style="color: var(--white); margin-bottom: 20px;">🔓 Brute Force Attack</h2>
+                <div style="color: var(--white); line-height: 1.8;">
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">📌 What is Brute Force Attack?</p>
+                    <p style="color: var(--slate); margin-bottom: 20px;">A brute force attack is when an attacker repeatedly tries different passwords for a single username until they get the correct one.</p>
+                    
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">⚙️ How This Attack Occurs</p>
+                    <ul style="color: var(--slate); margin-bottom: 20px; padding-left: 20px;">
+                        <li>Attacker selects one user account.</li>
+                        <li>Tries many password combinations.</li>
+                        <li>Repeats attempts until access is gained.</li>
+                    </ul>
+
+                    <div style="background: rgba(255, 77, 77, 0.1); border: 1px solid var(--alert); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <span style="color: var(--white); font-weight: 700;">🧪 Example Behavior</span><br>
+                        <code style="color: #ff4d4d;">admin / test123<br>admin / password<br>admin / 123456</code>
+                    </div>
+
+                    <div style="background: rgba(100, 255, 218, 0.1); border: 1px solid var(--accent); padding: 15px; border-radius: 8px;">
+                        <span style="color: var(--white); font-weight: 700;">🛡️ How WAF Protects</span><br>
+                        <ul style="color: var(--slate); padding-left: 20px; margin-top: 10px;">
+                            <li>Tracks failed login attempts per username</li>
+                            <li>Locks the account after 3 failures</li>
+                            <li>Temporarily disables login to prevent misuse</li>
+                        </ul>
+                    </div>
+                </div>`,
+            stuffing: `
+                <h2 style="color: var(--white); margin-bottom: 20px;">🚨 Credential Stuffing</h2>
+                <div style="color: var(--white); line-height: 1.8;">
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">📌 What is Credential Stuffing?</p>
+                    <p style="color: var(--slate); margin-bottom: 20px;">Credential Stuffing is an attack where an attacker uses leaked credentials to try logging into many accounts from the same IP address.</p>
+                    
+                    <p style="color: var(--accent); font-weight: 700; margin-bottom: 10px;">⚙️ How This Attack Occurs</p>
+                    <ul style="color: var(--slate); margin-bottom: 20px; padding-left: 20px;">
+                        <li>Attacker uses a list of stolen usernames.</li>
+                        <li>Attempts login for multiple accounts rapidly.</li>
+                        <li>Uses the same IP to access different users.</li>
+                    </ul>
+
+                    <div style="background: rgba(255, 77, 77, 0.1); border: 1px solid var(--alert); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <span style="color: var(--white); font-weight: 700;">🧪 Example Behavior</span><br>
+                        <code style="color: #ff4d4d;">user1 / pass123<br>user2 / pass123<br>user3 / pass123</code>
+                    </div>
+
+                    <div style="background: rgba(100, 255, 218, 0.1); border: 1px solid var(--accent); padding: 15px; border-radius: 8px;">
+                        <span style="color: var(--white); font-weight: 700;">🛡️ How WAF Protects</span><br>
+                        <ul style="color: var(--slate); padding-left: 20px; margin-top: 10px;">
+                            <li>Monitors login attempts per IP address</li>
+                            <li>Detects multiple usernames in short time</li>
+                            <li>Blocks the IP for a fixed duration</li>
+                        </ul>
+                    </div>
+                </div>`,
+        };
+
+        function openModal(key) {
+            document.getElementById('mContent').innerHTML = attackData[key];
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+    </script>
+</body>
+
+</html>

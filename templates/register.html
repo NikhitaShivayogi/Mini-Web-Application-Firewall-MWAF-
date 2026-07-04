@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniWAF | Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #020c1b; margin: 0; padding: 0; }
+        #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; top: 0; left: 0; }
+        .glass-card { background: rgba(17, 34, 64, 0.7) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(100, 255, 218, 0.1) !important; }
+        .password-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+        .password-toggle { position: absolute; right: 15px; cursor: pointer; color: var(--slate); transition: all 0.2s; z-index: 10; display: flex; align-items: center; }
+        .password-toggle:hover { color: var(--accent); }
+        #password { padding-right: 45px; }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <nav style="position: fixed; top: 0; left: 0; width: 100%; height: 80px; padding: 0 10%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(2, 12, 27, 0.4); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(100, 255, 218, 0.05);">
+        <div style="display: flex; align-items: center; gap: 15px; color: var(--white); font-family: 'Outfit'; font-weight: 700; font-size: 1.4rem;">
+            <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
+                <i data-lucide="shield-check" style="color: var(--accent); width: 32px; height: 32px;"></i>
+                Sentinel <span style="color: var(--accent);">WAF</span>
+            </a>
+        </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+             <a href="/" style="color: var(--white); text-decoration: none; font-size: 0.85rem; font-weight: 500;">HOME</a>
+             <a href="{{ url_for('login') }}" style="color: var(--white); text-decoration: none; font-size: 0.85rem; font-weight: 500;">LOGIN</a>
+        </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            <i data-lucide="info" style="width: 18px;"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <p style="color: var(--accent); letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase;">Protected by WAF</p>
+            <h1 style="color: var(--white); font-size: 2rem; font-family: 'Outfit';">Secure Registration</h1>
+        </div>
+
+        <div class="glass-card fade-in">
+            <form method="POST">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" required pattern="[A-Za-z]+" title="Alphabets only">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" required pattern="[A-Za-z]+" title="Alphabets only">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email ID</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required minlength="6" maxlength="15" pattern="[a-zA-Z0-9_]{6,15}" title="6-15 chars, alphanumeric/underscore">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password" required>
+                        <div class="password-toggle" id="togglePassword">
+                            <i data-lucide="eye" id="eyeIcon" style="width: 20px; height: 20px;"></i>
+                        </div>
+                    </div>
+                    <div class="strength-meter"><div class="strength-bar" id="strengthBar"></div></div>
+                    <span class="hint">Min 8 chars, Upper, Lower, Num, Special</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i data-lucide="shield-plus" style="width: 18px;"></i> Create Protected Account
+                </button>
+
+                <p style="margin-top: 1.5rem; text-align: center; color: var(--slate); font-size: 0.85rem;">
+                    Already secured? <a href="{{ url_for('login') }}" style="color: var(--accent); text-decoration: none;">Login</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        lucide.createIcons();
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#64ffda" },
+                "opacity": { "value": 0.2 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#64ffda", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
+            },
+            "interactivity": { "events": { "onhover": { "enable": true, "mode": "grab" } } },
+            "retina_detect": true
+        });
+
+        // 👁️ Password Toggle Logic
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            // Toggle Icon
+            if (type === 'text') {
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons(); // Refresh icons
+        });
+    </script>
+</body>
+</html>

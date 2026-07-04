@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MiniWAF | Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background: #020c1b; margin: 0; padding: 0; }
+        #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; top: 0; left: 0; }
+        .glass-card { background: rgba(17, 34, 64, 0.7) !important; backdrop-filter: blur(15px) !important; border: 1px solid rgba(100, 255, 218, 0.1) !important; }
+        .password-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+        .password-toggle { position: absolute; right: 15px; cursor: pointer; color: var(--slate); transition: all 0.2s; z-index: 10; display: flex; align-items: center; }
+        .password-toggle:hover { color: var(--accent); }
+        #pField { padding-right: 45px; }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <nav style="position: fixed; top: 0; left: 0; width: 100%; height: 80px; padding: 0 10%; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: rgba(2, 12, 27, 0.4); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(100, 255, 218, 0.05);">
+        <div style="display: flex; align-items: center; gap: 15px; color: var(--white); font-family: 'Outfit'; font-weight: 700; font-size: 1.4rem;">
+            <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
+                <i data-lucide="shield-check" style="color: var(--accent); width: 32px; height: 32px;"></i>
+                Sentinel <span style="color: var(--accent);">WAF</span>
+            </a>
+        </div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+             <a href="/" style="color: var(--white); text-decoration: none; font-size: 0.85rem; font-weight: 500;">HOME</a>
+             <a href="{{ url_for('register') }}" style="border: 2px solid var(--accent); color: var(--accent); padding: 8px 25px; border-radius: 5px; text-decoration: none; font-size: 0.85rem; font-weight: 700; transition: 0.3s;" onmouseover="this.style.background='rgba(100,255,218,0.1)'" onmouseout="this.style.background='transparent'">REGISTER</a>
+        </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash-msg flash-{{ category }}">
+            <i data-lucide="shield-alert" style="width: 18px;"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <p style="color: var(--accent); letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase;">Protected Infrastructure</p>
+            <h1 style="color: var(--white); font-size: 2rem; font-family: 'Outfit';">Security Portal Login</h1>
+        </div>
+
+        <div class="glass-card fade-in">
+            <h2 style="color: var(--white); font-size: 1.4rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="lock" style="color: var(--accent);"></i> Authenticate
+            </h2>
+
+            <!-- Lockout Timer Display (Moved logic to script to silence CSS lints) -->
+            <div id="lockoutTimer" data-seconds="{{ lockout_sec or 0 }}" style="display: none; align-items: start; gap: 15px; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; color: #ff4d4d; padding: 15px; border-radius: 8px; margin-bottom: 2rem; font-size: 0.95rem; white-space: pre-line; line-height: 1.5;">
+                <i data-lucide="shield-alert" style="width: 24px; min-width: 24px; margin-top: 2px;"></i>
+                <div style="flex-grow: 1;">
+                    <div id="blockReasonText" style="font-weight: 500;">{{ block_reason or 'Security Block Active' }}</div>
+                    <div style="margin-top: 10px; font-weight: 700; color: var(--white); font-family: monospace; font-size: 1.3rem; letter-spacing: 2px; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 4px; display: inline-block;" id="timerCount">00:00</div>
+                </div>
+            </div>
+
+            <form method="POST" id="authForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" id="uField" required autocomplete="off" minlength="6" maxlength="15" {% if lockout_sec and lockout_sec > 0 %}disabled{% endif %}>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="pField" required {% if lockout_sec and lockout_sec > 0 %}disabled{% endif %}>
+                        <div class="password-toggle" id="togglePassword">
+                            <i data-lucide="eye" id="eyeIcon" style="width: 20px; height: 20px;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="sBtn" class="btn btn-primary" {% if lockout_sec and lockout_sec > 0 %}disabled{% endif %}>
+                    <i data-lucide="shield-check" style="width: 18px;"></i> Verify & Continue
+                </button>
+
+                <p style="margin-top: 1.5rem; text-align: center; color: var(--slate); font-size: 0.85rem;">
+                    New Secure Profile? <a href="{{ url_for('register') }}" style="color: var(--accent); text-decoration: none;">Register Now</a>
+                </p>
+                <div style="margin-top: 1.5rem; border-top: 1px solid var(--lightest-navy); padding-top: 1.5rem; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <p style="font-size: 0.7rem; color: var(--slate); opacity: 0.6; text-align: center;">Try SQLi: <code>' OR 1=1 --</code> or XSS: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> to test the WAF.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        lucide.createIcons();
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#64ffda" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2 },
+                "size": { "value": 2 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#64ffda", "opacity": 0.1, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
+            },
+            "interactivity": { "events": { "onhover": { "enable": true, "mode": "grab" } } },
+            "retina_detect": true
+        });
+
+        // 🛡️ Enhanced Countdown Logic
+        const timerBox = document.getElementById('lockoutTimer');
+        const lockoutSec = parseInt(timerBox.dataset.seconds);
+        
+        if (lockoutSec > 0) {
+            let remaining = lockoutSec;
+            const timerEl = document.getElementById('timerCount');
+            const fields = [document.getElementById('uField'), document.getElementById('pField'), document.getElementById('sBtn')];
+            
+            // Activate UI
+            timerBox.style.display = 'flex';
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            const interval = setInterval(() => {
+                remaining--;
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    timerBox.style.display = 'none';
+                    fields.forEach(f => f.disabled = false);
+                    location.reload(); 
+                } else {
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // 👁️ Password Toggle Logic
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('pField');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            // Toggle Icon
+            if (type === 'text') {
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons(); // Refresh icons
+        });
+    </script>
+</body>
+</html>

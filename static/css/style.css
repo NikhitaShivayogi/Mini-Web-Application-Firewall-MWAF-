@@ -1,0 +1,299 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700&display=swap');
+
+:root {
+    --navy: #0a192f;
+    --light-navy: #112240;
+    --lightest-navy: #233554;
+    --slate: #8892b0;
+    --light-slate: #a8b2d1;
+    --lightest-slate: #ccd6f6;
+    --white: #e6f1ff;
+    --accent: #64ffda; /* Cyber Green */
+    --accent-dark: #00b48a;
+    --alert: #ff4d4d; /* SQLi/XSS Alert */
+    --warning: #ffb703; /* Brute Force Warning */
+    --glass: rgba(17, 34, 64, 0.7);
+    --glass-border: rgba(100, 255, 218, 0.1);
+    --shadow: 0 10px 30px -15px rgba(2, 12, 27, 0.7);
+    --transition: all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--navy);
+    color: var(--lightest-slate);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Background Animation */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 15% 50%, rgba(100, 255, 218, 0.05) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(100, 255, 218, 0.05) 0%, transparent 25%);
+    z-index: -1;
+}
+
+/* Flash Messages */
+.flash-msg {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    min-width: 300px;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideDown 0.3s forwards;
+    backdrop-filter: blur(8px);
+}
+
+@keyframes slideDown {
+    from { top: -100px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+}
+
+.flash-error { 
+    background: rgba(255, 77, 77, 0.15); 
+    border: 1px solid var(--alert); 
+    color: var(--alert);
+}
+.flash-success { 
+    background: rgba(100, 255, 218, 0.15); 
+    border: 1px solid var(--accent); 
+    color: var(--accent);
+}
+.flash-warning { 
+    background: rgba(255, 183, 3, 0.15); 
+    border: 1px solid var(--warning); 
+    color: var(--warning);
+}
+
+/* Glass Card */
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 2rem;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--accent);
+    font-weight: 500;
+}
+
+input {
+    width: 100%;
+    background: var(--lightest-navy);
+    border: 1px solid var(--lightest-navy);
+    border-radius: 6px;
+    padding: 12px 16px;
+    color: var(--white);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(100, 255, 218, 0.1);
+}
+
+input.error {
+    border-color: var(--alert);
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: var(--slate);
+    margin-top: 0.4rem;
+    display: block;
+}
+
+.error-message {
+    font-size: 0.75rem;
+    color: var(--alert);
+    margin-top: 0.4rem;
+    display: none;
+}
+
+/* Buttons */
+.btn {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: rgba(100, 255, 218, 0.05);
+}
+
+/* Password Strength */
+.strength-meter {
+    height: 4px;
+    width: 100%;
+    background: var(--lightest-navy);
+    border-radius: 2px;
+    margin-top: 0.8rem;
+    overflow: hidden;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: var(--transition);
+}
+
+/* Dashboard Specific */
+.dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.stats-card {
+    background: var(--light-navy);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid var(--accent);
+}
+
+.stats-card.alert {
+    border-left-color: var(--alert);
+}
+
+.stats-card h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--slate);
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.stats-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+}
+
+.table-container {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    padding: 12px;
+    color: var(--accent);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--lightest-navy);
+}
+
+td {
+    padding: 12px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(136, 146, 176, 0.05);
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-active { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.status-failed { background: var(--alert); box-shadow: 0 0 10px var(--alert); }
+
+.mt-2 { margin-top: 2rem !important; }
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .glass-card {
+        padding: 1.5rem;
+    }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
